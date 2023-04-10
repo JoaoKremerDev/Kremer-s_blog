@@ -1,0 +1,1 @@
+Esse readme será atualizado ao final do projeto com maiores informações.
