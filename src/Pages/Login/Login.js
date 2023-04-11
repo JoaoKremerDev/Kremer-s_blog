@@ -12,7 +12,7 @@ const Login = () => {
   const [error, setError] = useState("");
 
   const {
-    createUser,
+    login,
     error: authError,
     loading,
     registered,
@@ -29,7 +29,7 @@ const Login = () => {
       password,
     };
 
-    const res = await createUser(user);
+    const res = await login(user);
 
     console.log(res);
   };

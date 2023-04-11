@@ -18,7 +18,7 @@ export const useAuthentication = () => {
   //deal with memory leak
 
   const [cancelled, setCancelled] = useState(false);
-  const [registered, setRegistered] = useState(null)
+  const [registered, setRegistered] = useState(null);
 
   const auth = getAuth();
 
@@ -47,7 +47,6 @@ export const useAuthentication = () => {
       setLoading(false);
       setRegistered(true);
       return user;
-      
     } catch (error) {
       console.log(error.message);
       console.log(typeof error.message);
@@ -56,29 +55,54 @@ export const useAuthentication = () => {
 
       if (error.message.includes("Password")) {
         systemErrorMessage = "A senha precisa conter pelo menos 6 caracteres.";
-        setRegistered(false)
+        setRegistered(false);
       } else if (error.message.includes("email-already")) {
         systemErrorMessage = "E-mail já cadastrado.";
-        setRegistered(false)
+        setRegistered(false);
       } else {
         systemErrorMessage = "Ocorreu um erro, por favor tente mais tarde.";
-        setRegistered(false)
+        setRegistered(false);
       }
       setLoading(false);
       setError(systemErrorMessage);
-
     }
-}
-// logout - sign out 
+  };
+  // logout - sign out
 
-const logout = () => {
-  checkIfIsCancelled()
-  signOut(auth)
-}
+  const logout = () => {
+    checkIfIsCancelled();
+    signOut(auth);
+  };
+
+  // Login - sign in
+
+  const login = async (data) => {
+    checkIfIsCancelled();
+
+    setLoading(true);
+    setError(false);
+
+    try {
+      await signInWithEmailAndPassword(auth, data.email, data.password);
+      setLoading(false)
+    } catch (error) {
+      let systemErrorMessage;
+      
+
+      if (error.message.includes("user-not-found")) {
+        systemErrorMessage = "Usuário não encontrado";
+      } else if (error.message.includes("wrong-password")) {
+        systemErrorMessage = "Senha incorreta.";
+      } else {
+        systemErrorMessage = "Ocorreu um erro, por favor tente mais tarde!";
+      }
+      setError(systemErrorMessage);
+      setLoading(false)
+    }
+  }
     useEffect(() => {
       return () => setCancelled(true);
     }, []);
-
     return {
       auth,
       createUser,
@@ -87,6 +111,7 @@ const logout = () => {
       registered,
       setRegistered,
       logout,
+      login,
     };
   };
 
