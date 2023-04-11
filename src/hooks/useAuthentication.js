@@ -6,7 +6,7 @@ import {
     signOut
 } from 'firebase/auth'
 
-import { useState, useffe } from 'react'
+import { useEffect, useState, useffe } from 'react'
 
 export const useAuthentication = () => {
     const [error, setError] = useState(null);
@@ -23,5 +23,41 @@ export const useAuthentication = () => {
         if(cancelled) {
             return;
         }
+    }
+
+    const createUser = async (data) => {
+        checkIfIsCancelled()
+        setLoading(true)
+
+        try {
+            const {user} = await createUserWithEmailAndPassword(
+                auth,
+                data.email,
+                data.password
+            )
+
+            await updateProfile(user, {
+                displayName: data.displayName
+            })
+
+            return user
+            
+        await updateProfile(user, {})
+        } catch (error) {
+            console.log(error.message)
+            console.log(typeof error.message)
+        }
+
+        setLoading(false)
+    }
+    useEffect(() => {
+        return () => setCancelled(true);
+    }, []);
+    
+    return {
+        auth,
+        createUser,
+        error,
+        loading,
     }
 }
