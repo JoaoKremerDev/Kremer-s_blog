@@ -18,6 +18,7 @@ export const useAuthentication = () => {
   //deal with memory leak
 
   const [cancelled, setCancelled] = useState(false);
+  const [registered, setRegistered] = useState(null)
 
   const auth = getAuth();
 
@@ -31,6 +32,7 @@ export const useAuthentication = () => {
     checkIfIsCancelled();
     setLoading(true);
     setError(null);
+    setRegistered(false);
 
     try {
       const { user } = await createUserWithEmailAndPassword(
@@ -42,8 +44,10 @@ export const useAuthentication = () => {
       await updateProfile(user, {
         displayName: data.displayName,
       });
-
+      setLoading(false);
+      setRegistered(true);
       return user;
+      
     } catch (error) {
       console.log(error.message);
       console.log(typeof error.message);
@@ -52,15 +56,17 @@ export const useAuthentication = () => {
 
       if (error.message.includes("Password")) {
         systemErrorMessage = "A senha precisa conter pelo menos 6 caracteres.";
-      } else if (error.message.includes("email-already.")) {
+        setRegistered(false)
+      } else if (error.message.includes("email-already")) {
         systemErrorMessage = "E-mail já cadastrado.";
+        setRegistered(false)
       } else {
         systemErrorMessage = "Ocorreu um erro, por favor tente mais tarde.";
+        setRegistered(false)
       }
-
+      setLoading(false);
       setError(systemErrorMessage);
 
-      setLoading(false);
     }
 }
 
@@ -73,6 +79,9 @@ export const useAuthentication = () => {
       createUser,
       error,
       loading,
+      registered,
+      setRegistered,
+      
     };
   };
 

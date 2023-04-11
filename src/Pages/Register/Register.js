@@ -10,7 +10,13 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
 
-  const { createUser, error: authError, loading } = useAuthentication();
+  const {
+    createUser,
+    error: authError,
+    loading,
+    registered,
+    setRegistered,
+  } = useAuthentication();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,6 +38,19 @@ const Register = () => {
 
     console.log(res);
   };
+
+  useEffect(() => {
+    if (registered) {
+      setDisplayName("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+      
+      setTimeout(() => {
+        setRegistered(false);
+      }, 3000);
+    }
+  }, [registered]);
 
   useEffect(() => {
     if (authError) {
@@ -95,6 +114,9 @@ const Register = () => {
           </button>
         )}
         {error && <p className="error">{error}</p>}
+        {registered && (
+          <p className={styles.registered}>O usuário foi cadastrado com sucesso!</p>
+        )}
       </form>
     </div>
   );
