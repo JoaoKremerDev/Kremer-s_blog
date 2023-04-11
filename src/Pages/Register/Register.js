@@ -1,29 +1,43 @@
 import styles from "./Register.module.css";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useAuthentication } from "../../hooks/useAuthentication";
 
 const Register = () => {
-    const [displayName, setDisplayName] = useState("")
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    const [confirmPassword, setConfirmPassword] =  useState("")
-    const [error, setError] = useState("")
+  const [displayName, setDisplayName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
 
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        setError("")
-        
-        const user = {
-            displayName: displayName,
-            email: email,
-            password: password,
-        }
+  const { createUser, error: authError, loading } = useAuthentication();
 
-        if(password !== confirmPassword) {
-            setError("As senhas precisam ser iguais!")
-        }
-        console.log(user)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    setError("");
+
+    const user = {
+      displayName,
+      email,
+      password,
+    };
+
+    if (password !== confirmPassword) {
+      setError("As senhas precisam ser iguais.");
+      return;
     }
+
+    const res = await createUser(user);
+
+    console.log(res);
+  };
+
+  useEffect(() => {
+    if (authError) {
+      setError(authError);
+    }
+  }, [authError]);
 
   return (
     <div className={styles.register}>
@@ -37,30 +51,30 @@ const Register = () => {
             name="displayName"
             required
             placeholder="Nome do usuário"
-            value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
+            value={displayName}
           />
         </label>
         <label>
-          <span>Email:</span>
+          <span>E-mail:</span>
           <input
             type="email"
             name="email"
             required
             placeholder="E-mail do usuário"
-            value={email}
             onChange={(e) => setEmail(e.target.value)}
+            value={email}
           />
         </label>
         <label>
           <span>Senha:</span>
           <input
             type="password"
-            name="Password"
+            name="password"
             required
-            placeholder="Insira a sua senha"
-            value={password}
+            placeholder="Insira a senha"
             onChange={(e) => setPassword(e.target.value)}
+            value={password}
           />
         </label>
         <label>
@@ -69,13 +83,18 @@ const Register = () => {
             type="password"
             name="confirmPassword"
             required
-            placeholder="Confirme a sua senha"
-            value={confirmPassword}
+            placeholder="Confirme a senha"
             onChange={(e) => setConfirmPassword(e.target.value)}
+            value={confirmPassword}
           />
         </label>
-        <button className="btn">Cadastrar</button>
-        {error && <p className="error">As senhas precisam ser iguais!</p>}
+        {!loading && <button className="btn">Entrar</button>}
+        {loading && (
+          <button className="btn" disabled>
+            Aguarde...
+          </button>
+        )}
+        {error && <p className="error">{error}</p>}
       </form>
     </div>
   );
